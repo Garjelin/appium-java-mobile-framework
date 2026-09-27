@@ -1,89 +1,74 @@
 package io.github.garjelin.tests;
 
 import io.appium.java_client.AppiumBy;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.options.UiAutomator2Options;
+import io.github.garjelin.config.Config;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
 
 /**
- * Stage 0 smoke test: proves the whole chain works end to end
- * (Java client -> Appium server -> UiAutomator2 driver -> emulator -> app).
+ * Smoke test: the catalog opens and shows products with non-empty titles.
+ * Runs unchanged on both platforms: ./gradlew test -Dplatform=android | -Dplatform=ios
  *
- * Intentionally "raw": session setup, config and locators all live here.
- * Stage 1 will extract them into a DriverFactory and config files.
+ * Session setup lives in BaseTest; driver creation in DriverFactory.
+ * The locator switch and the wait helper below are temporary: Stage 2 moves them into Page Objects.
  */
-public class FirstSessionTest {
-
-    // Local Appium server started with `appium` in a separate terminal.
-    private static final String APPIUM_SERVER = "http://127.0.0.1:4723";
-
-    // Every product card title shares this content-desc, so it matches ALL visible titles.
-    private static final By PRODUCT_TITLES = AppiumBy.accessibilityId("Product Title");
+public class FirstSessionTest extends BaseTest {
 
     // Upper bound for explicit waits. The app usually renders in 1-3 s;
-    // 15 s leaves room for a cold emulator without hiding real hangs.
+    // 15 s leaves room for a cold device without hiding real hangs.
     private static final Duration TIMEOUT = Duration.ofSeconds(15);
-
-    private AndroidDriver driver;
-
-    @BeforeMethod
-    public void setUp() throws MalformedURLException {
-        // Relative to the project root (Gradle's working dir for tests),
-        // converted to absolute because the Appium server has its own working dir.
-        String appPath = Path.of("apps", "mda-2.3.0.apk").toAbsolutePath().toString();
-
-        // Typed wrapper over W3C capabilities. It already sets
-        // platformName=Android and appium:automationName=UiAutomator2.
-        UiAutomator2Options options = new UiAutomator2Options()
-                .setDeviceName("Pixel_8_API_34")
-                .setApp(appPath);
-
-        // URI.create(...).toURL() instead of new URL(String), which is deprecated since JDK 20.
-        URL serverUrl = URI.create(APPIUM_SERVER).toURL();
-
-        // This line sends POST /session - the same request Inspector sent.
-        driver = new AndroidDriver(serverUrl, options);
-    }
 
     @Test
     public void catalogShowsProducts() {
-        WebDriverWait wait = new WebDriverWait(driver, TIMEOUT);
+        // Non-empty by construction: waitForVisible() times out instead of returning an empty list.
+        List<WebElement> titles = waitForVisible(productTitles());
 
-        // Explicit wait: polls until at least one title is visible, then returns all of them.
-        // Throws TimeoutException with a clear message if the catalog never appears.
-        List<WebElement> titles = wait.until(
-                ExpectedConditions.visibilityOfAllElementsLocatedBy(PRODUCT_TITLES));
+        // Check every visible title, not "the first product": catalog data and order change.
+        for (WebElement title : titles) {
+            Assert.assertFalse(title.getText().isBlank(), "Product title should not be blank");
+        }
 
-        // RecyclerView keeps only on-screen cards in the tree, so this is
-        // "visible products", not the full catalog size.
-        Assert.assertFalse(titles.isEmpty(), "Catalog should show at least one product");
-
-        String firstTitle = titles.get(0).getText();
-        Assert.assertFalse(firstTitle.isBlank(), "First product title should not be blank");
-
-        System.out.println("Visible products: " + titles.size() + ", first: " + firstTitle);
+        System.out.println(Config.platform() + ": visible products = " + titles.size());
     }
 
-    // alwaysRun: clean up even if the test failed, so the device is free for the next run.
-    @AfterMethod(alwaysRun = true)
-    public void tearDown() {
-        // null check: if setUp failed before the session was created, there is nothing to quit.
-        if (driver != null) {
-            driver.quit(); // sends DELETE /session/<id>
-        }
+    /**
+     * Same meaning ("product title"), different accessibility id per platform:
+     * Android content-desc = "Product Title", iOS name = "Product Name".
+     * TODO(stage 2): move into CatalogPage.
+     */
+    private static By productTitles() {
+        return switch (Config.platform()) {
+            case ANDROID -> AppiumBy.accessibilityId("Product Title");
+            case IOS -> AppiumBy.accessibilityId("Product Name");
+        };
+    }
+
+    /**
+     * Waits until AT LEAST ONE element is visible and returns the visible ones.
+     *
+     * Not ExpectedConditions.visibilityOfAllElementsLocatedBy: it requires ALL matches to be
+     * visible, and a list can contain partly off-screen cells (especially on iOS), so it would
+     * keep returning null until timeout.
+     * TODO(stage 2): move into BasePage.
+     */
+    private List<WebElement> waitForVisible(By locator) {
+        return new WebDriverWait(driver(), TIMEOUT)
+                // The screen may re-render between findElements() and isDisplayed():
+                // a stale element just means "try again on the next poll", not a failure.
+                .ignoring(StaleElementReferenceException.class)
+                .until(driver -> {
+                    List<WebElement> visible = driver.findElements(locator).stream()
+                            .filter(WebElement::isDisplayed)
+                            .toList();
+                    // null = condition not met yet, WebDriverWait polls again after 500 ms.
+                    return visible.isEmpty() ? null : visible;
+                });
     }
 }

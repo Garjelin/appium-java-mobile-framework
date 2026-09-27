@@ -38,6 +38,10 @@ tasks.test {
     // Tell Gradle to run tests with TestNG instead of the default JUnit.
     useTestNG()
 
+    // `./gradlew test -Dplatform=ios` sets the property in the Gradle JVM only.
+    // Tests run in a separate forked JVM, so forward it explicitly (default: android).
+    systemProperty("platform", providers.systemProperty("platform").getOrElse("android"))
+
     // Print each test result and full stack traces in the terminal,
     // so failures are readable without opening the HTML report.
     testLogging {
