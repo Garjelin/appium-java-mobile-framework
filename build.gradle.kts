@@ -42,6 +42,10 @@ tasks.test {
     // Tests run in a separate forked JVM, so forward it explicitly (default: android).
     systemProperty("platform", providers.systemProperty("platform").getOrElse("android"))
 
+    // UI tests depend on things Gradle cannot see (device, app build, Appium server),
+    // so never treat the test task as UP-TO-DATE: `./gradlew test` always really runs.
+    outputs.upToDateWhen { false }
+
     // Print each test result and full stack traces in the terminal,
     // so failures are readable without opening the HTML report.
     testLogging {
