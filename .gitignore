@@ -18,3 +18,6 @@ apps/*
 allure-results/
 allure-report/
 *.log
+
+# --- Page source dumps from Appium Inspector (local reference for writing locators) ---
+page-sources/

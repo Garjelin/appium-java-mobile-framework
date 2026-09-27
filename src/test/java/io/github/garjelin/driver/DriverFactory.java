@@ -36,9 +36,12 @@ public final class DriverFactory {
 
     private static UiAutomator2Options androidOptions() {
         // Sets platformName=Android and appium:automationName=UiAutomator2 by itself.
-        return new UiAutomator2Options()
+        UiAutomator2Options options = new UiAutomator2Options()
                 .setDeviceName(Config.get("device.name"))
                 .setApp(appPath());
+        // Optional: which activity counts as "app started" (see android.properties).
+        Config.find("app.wait.activity").ifPresent(options::setAppWaitActivity);
+        return options;
     }
 
     private static XCUITestOptions iosOptions() {
