@@ -10,7 +10,7 @@ import io.github.garjelin.pages.CheckoutPaymentPage;
 import io.github.garjelin.pages.LoginPage;
 import io.github.garjelin.pages.ProductPage;
 import io.github.garjelin.pages.ReviewOrderPage;
-import io.github.garjelin.support.KnownIssues;
+import io.github.garjelin.support.KnownIssue;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -23,9 +23,9 @@ public class CheckoutTest extends BaseTest {
      * so a broken navigation fails at the exact step.
      */
     @Test
+    @KnownIssue(id = "KNOWN-1", platform = Platform.IOS,
+            summary = "on-screen keyboard cannot be closed and covers checkout buttons")
     public void userCompletesPurchase() {
-        KnownIssues.skipOn(Platform.IOS, "KNOWN-1", "on-screen keyboard cannot be closed and covers checkout buttons");
-
         CatalogPage catalog = new CatalogPage();
         catalog.openFirstProduct();
 

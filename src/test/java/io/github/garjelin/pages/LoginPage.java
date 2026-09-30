@@ -28,7 +28,7 @@ public class LoginPage extends BasePage {
     /** Leads to CheckoutAddressPage. */
     public void loginAs(User user) {
         type(USERNAME, user.username());
-        type(PASSWORD, user.password());
+        typeSecret(PASSWORD, user.password());
         tap(LOGIN);
     }
 }

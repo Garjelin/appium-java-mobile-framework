@@ -32,11 +32,24 @@ dependencies {
     // java-client logs through SLF4J; without a provider it prints a warning
     // and drops all logs. slf4j-simple writes them to the console.
     testRuntimeOnly("org.slf4j:slf4j-simple:2.0.17")
+
+    // Allure report: TestNG integration (steps, attachments, retries).
+    // Its TestNG listener is registered automatically via Java ServiceLoader.
+    testImplementation("io.qameta.allure:allure-testng:2.35.3")
 }
 
 tasks.test {
     // Tell Gradle to run tests with TestNG instead of the default JUnit.
-    useTestNG()
+    useTestNG {
+        // Attaches RetryAnalyzer to every @Test (see support/RetryTransformer).
+        listeners.add("io.github.garjelin.support.RetryTransformer")
+    }
+
+    // Max retries of a failed test: ./gradlew test -Dretries=0 disables them.
+    systemProperty("retries", providers.systemProperty("retries").getOrElse("1"))
+
+    // Where Allure writes raw results. Report: `allure serve build/allure-results`.
+    systemProperty("allure.results.directory", layout.buildDirectory.dir("allure-results").get().asFile.absolutePath)
 
     // `./gradlew test -Dplatform=ios` sets the property in the Gradle JVM only.
     // Tests run in a separate forked JVM, so forward it explicitly (default: android).
