@@ -27,9 +27,8 @@ public class CatalogPage extends BasePage {
                 .toList();
     }
 
-    /** Opens the first visible product. Its title is visibleProductTitles().get(0). */
-    public ProductPage openFirstProduct() {
+    /** Taps the first visible product. Its title is visibleProductTitles().get(0). Leads to ProductPage. */
+    public void openFirstProduct() {
         tap(PRODUCT_IMAGES);
-        return new ProductPage();
     }
 }

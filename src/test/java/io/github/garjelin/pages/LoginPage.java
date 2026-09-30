@@ -25,10 +25,10 @@ public class LoginPage extends BasePage {
         super(USERNAME);
     }
 
-    public CheckoutAddressPage loginAs(User user) {
+    /** Leads to CheckoutAddressPage. */
+    public void loginAs(User user) {
         type(USERNAME, user.username());
         type(PASSWORD, user.password());
         tap(LOGIN);
-        return new CheckoutAddressPage();
     }
 }

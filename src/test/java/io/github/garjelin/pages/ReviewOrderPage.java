@@ -15,8 +15,8 @@ public class ReviewOrderPage extends BasePage {
         super(PLACE_ORDER);
     }
 
-    public CheckoutCompletePage placeOrder() {
+    /** Leads to CheckoutCompletePage. */
+    public void placeOrder() {
         tap(PLACE_ORDER);
-        return new CheckoutCompletePage();
     }
 }

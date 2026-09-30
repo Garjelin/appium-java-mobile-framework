@@ -18,13 +18,12 @@ public class ProductPage extends BasePage {
         super(ADD_TO_CART);
     }
 
-    public ProductPage addToCart() {
+    public void addToCart() {
         tap(ADD_TO_CART);
-        return this; // stay on the same screen: allows product.addToCart().openCart()
     }
 
-    public CartPage openCart() {
+    /** Leads to CartPage. */
+    public void openCart() {
         tap(CART);
-        return new CartPage();
     }
 }

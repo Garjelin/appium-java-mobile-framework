@@ -20,8 +20,11 @@ import java.util.List;
  * Responsibilities:
  * 1. Every UI interaction (wait, tap, type, read) goes through ONE place, so waiting
  *    rules and fixes (stale elements, keyboard) apply to the whole framework at once.
- * 2. A page verifies it is really on screen when it is created (screen marker),
- *    so a wrong navigation fails at the step that caused it, with a clear message.
+ * 2. A page verifies it is really on screen when it is created (screen marker).
+ *    Tests create the next page explicitly after a navigation action
+ *    (catalog.openFirstProduct(); ProductPage product = new ProductPage();),
+ *    so the test shows which screen it is on, and creating the page IS the check
+ *    that navigation worked: a wrong screen fails right there, with a clear message.
  * 3. Helpers to declare "same element, different locator per platform".
  */
 public abstract class BasePage {

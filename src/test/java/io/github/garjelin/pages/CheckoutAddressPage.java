@@ -27,7 +27,7 @@ public class CheckoutAddressPage extends BasePage {
         super(SCREEN);
     }
 
-    public CheckoutAddressPage fillShippingAddress(Address address) {
+    public void fillShippingAddress(Address address) {
         type(FULL_NAME, address.fullName());
         type(ADDRESS_LINE_1, address.addressLine1());
         typeIfPresent(ADDRESS_LINE_2, address.addressLine2());
@@ -35,12 +35,11 @@ public class CheckoutAddressPage extends BasePage {
         type(ZIP_CODE, address.zipCode());
         typeIfPresent(STATE, address.state());
         type(COUNTRY, address.country());
-        return this;
     }
 
-    public CheckoutPaymentPage toPayment() {
+    /** Leads to CheckoutPaymentPage. */
+    public void toPayment() {
         tap(TO_PAYMENT);
-        return new CheckoutPaymentPage();
     }
 
     /** Optional fields: skip when the test data leaves them empty. */

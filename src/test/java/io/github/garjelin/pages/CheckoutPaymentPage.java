@@ -26,16 +26,15 @@ public class CheckoutPaymentPage extends BasePage {
         super(SCREEN);
     }
 
-    public CheckoutPaymentPage fillCard(Card card) {
+    public void fillCard(Card card) {
         type(HOLDER_NAME, card.holderName());
         type(CARD_NUMBER, card.number());
         type(EXPIRATION_DATE, card.expirationDate());
         type(SECURITY_CODE, card.securityCode());
-        return this;
     }
 
-    public ReviewOrderPage reviewOrder() {
+    /** Leads to ReviewOrderPage. */
+    public void reviewOrder() {
         tap(REVIEW_ORDER);
-        return new ReviewOrderPage();
     }
 }

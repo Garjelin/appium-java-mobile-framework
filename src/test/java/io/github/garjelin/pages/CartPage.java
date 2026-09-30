@@ -32,8 +32,8 @@ public class CartPage extends BasePage {
         return isVisibleNow(item);
     }
 
-    public LoginPage proceedToCheckout() {
+    /** Leads to LoginPage (the user is not logged in yet). */
+    public void proceedToCheckout() {
         tap(PROCEED_TO_CHECKOUT);
-        return new LoginPage();
     }
 }
