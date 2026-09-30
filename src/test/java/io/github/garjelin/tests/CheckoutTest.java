@@ -1,8 +1,10 @@
 package io.github.garjelin.tests;
 
+import io.github.garjelin.config.Platform;
 import io.github.garjelin.data.TestData;
 import io.github.garjelin.pages.CatalogPage;
 import io.github.garjelin.pages.CheckoutCompletePage;
+import io.github.garjelin.support.KnownIssues;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -14,6 +16,8 @@ public class CheckoutTest extends BaseTest {
      */
     @Test
     public void userCompletesPurchase() {
+        KnownIssues.skipOn(Platform.IOS, "KNOWN-1", "on-screen keyboard cannot be closed and covers checkout buttons");
+
         CheckoutCompletePage complete = new CatalogPage()
                 .openFirstProduct()
                 .addToCart()
