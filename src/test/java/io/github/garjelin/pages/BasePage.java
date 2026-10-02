@@ -124,6 +124,19 @@ public abstract class BasePage {
         });
     }
 
+    /** Taps the N-th (0-based) VISIBLE element matching the locator, e.g. the 2nd product card. */
+    protected void tap(By locator, int index) {
+        Allure.step("Tap #" + index + " of " + describe(locator), () -> {
+            hideKeyboardIfShown();
+            List<WebElement> visible = waitAllVisible(locator);
+            if (index >= visible.size()) {
+                throw new IllegalArgumentException("Asked for element #" + index + " but only "
+                        + visible.size() + " visible for " + describe(locator));
+            }
+            visible.get(index).click();
+        });
+    }
+
     protected void type(By locator, String text) {
         Allure.step("Type '" + text + "' into " + describe(locator), () -> {
             enterText(locator, text);
