@@ -10,6 +10,7 @@ import io.github.garjelin.pages.CheckoutPaymentPage;
 import io.github.garjelin.pages.LoginPage;
 import io.github.garjelin.pages.ProductPage;
 import io.github.garjelin.pages.ReviewOrderPage;
+import io.github.garjelin.support.Groups;
 import io.github.garjelin.support.KnownIssue;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -22,7 +23,7 @@ public class CheckoutTest extends BaseTest {
      * the test shows where it is, and each "new XxxPage()" waits for that screen,
      * so a broken navigation fails at the exact step.
      */
-    @Test
+    @Test(groups = Groups.E2E)
     @KnownIssue(id = "KNOWN-1", platform = Platform.IOS,
             summary = "on-screen keyboard cannot be closed and covers checkout buttons")
     public void userCompletesPurchase() {

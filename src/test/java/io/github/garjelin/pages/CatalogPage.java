@@ -29,6 +29,14 @@ public class CatalogPage extends BasePage {
 
     /** Taps the first visible product. Its title is visibleProductTitles().get(0). Leads to ProductPage. */
     public void openFirstProduct() {
-        tap(PRODUCT_IMAGES);
+        openProduct(0);
+    }
+
+    /**
+     * Taps the visible product at a position (0-based, in reading order).
+     * Its title is visibleProductTitles().get(position). Leads to ProductPage.
+     */
+    public void openProduct(int position) {
+        tap(PRODUCT_IMAGES, position);
     }
 }

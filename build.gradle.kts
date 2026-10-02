@@ -43,6 +43,12 @@ tasks.test {
     useTestNG {
         // Attaches RetryAnalyzer to every @Test (see support/RetryTransformer).
         listeners.add("io.github.garjelin.support.RetryTransformer")
+
+        // Run a subset: ./gradlew test -Dgroups=smoke  (several: -Dgroups=smoke,e2e).
+        // Without the flag all tests run. Group names: support/Groups.java.
+        providers.systemProperty("groups").orNull?.let { groups ->
+            includeGroups(*groups.split(",").map(String::trim).toTypedArray())
+        }
     }
 
     // Max retries of a failed test: ./gradlew test -Dretries=0 disables them.
