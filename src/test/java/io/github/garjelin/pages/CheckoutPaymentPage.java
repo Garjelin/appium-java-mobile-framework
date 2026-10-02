@@ -30,7 +30,7 @@ public class CheckoutPaymentPage extends BasePage {
         type(HOLDER_NAME, card.holderName());
         type(CARD_NUMBER, card.number());
         type(EXPIRATION_DATE, card.expirationDate());
-        type(SECURITY_CODE, card.securityCode());
+        typeSecret(SECURITY_CODE, card.securityCode());
     }
 
     /** Leads to ReviewOrderPage. */

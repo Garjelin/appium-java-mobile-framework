@@ -1,7 +1,7 @@
 # Known issues
 
 App defects found by the tests. A test blocked by a defect is **skipped with the issue id**
-(see `KnownIssues.skipOn`), never deleted: remove the skip when the defect is fixed.
+(`@KnownIssue(id = ..., platform = ...)` on the test), never deleted: remove the annotation when the defect is fixed.
 
 ## KNOWN-1 — iOS: on-screen keyboard cannot be closed and covers checkout buttons
 

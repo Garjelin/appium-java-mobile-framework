@@ -6,6 +6,7 @@ import io.appium.java_client.HasOnScreenKeyboard;
 import io.appium.java_client.HidesKeyboard;
 import io.github.garjelin.config.Config;
 import io.github.garjelin.driver.DriverManager;
+import io.qameta.allure.Allure;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
@@ -42,7 +43,10 @@ public abstract class BasePage {
      */
     protected BasePage(By screenMarker) {
         this.driver = DriverManager.driver();
-        waitVisible(screenMarker);
+        // Shown in the Allure report as a step: "Screen: CartPage".
+        Allure.step("Screen: " + getClass().getSimpleName(), () -> {
+            waitVisible(screenMarker);
+        });
     }
 
     // ---------- Locator helpers ----------
@@ -108,17 +112,41 @@ public abstract class BasePage {
 
     // ---------- Actions ----------
 
+    // Every action is an Allure step, so the report shows exactly where a test stopped.
+    // Block lambdas "() -> { ... }" on purpose: Allure.step has overloads for
+    // "returns a value" and "returns nothing", and a block without return picks the second.
+
     protected void tap(By locator) {
-        // An open keyboard can cover the target (e.g. the "next" button under a form).
-        hideKeyboardIfShown();
-        waitVisible(locator).click();
+        Allure.step("Tap " + describe(locator), () -> {
+            // An open keyboard can cover the target (e.g. the "next" button under a form).
+            hideKeyboardIfShown();
+            waitVisible(locator).click();
+        });
     }
 
     protected void type(By locator, String text) {
+        Allure.step("Type '" + text + "' into " + describe(locator), () -> {
+            enterText(locator, text);
+        });
+    }
+
+    /** Same as type(), but keeps the value out of the report (passwords, card codes). */
+    protected void typeSecret(By locator, String text) {
+        Allure.step("Type ***** into " + describe(locator), () -> {
+            enterText(locator, text);
+        });
+    }
+
+    private void enterText(By locator, String text) {
         WebElement field = waitVisible(locator);
         field.clear();
         field.sendKeys(text);
         hideKeyboardIfShown();
+    }
+
+    /** "AppiumBy.accessibilityId: View cart" -> "accessibilityId: View cart" for readable step names. */
+    private static String describe(By locator) {
+        return locator.toString().replaceFirst("^AppiumBy\\.", "");
     }
 
     protected String textOf(By locator) {

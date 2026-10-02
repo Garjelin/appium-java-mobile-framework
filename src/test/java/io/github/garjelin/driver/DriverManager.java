@@ -25,6 +25,11 @@ public final class DriverManager {
         DRIVER.set(DriverFactory.create());
     }
 
+    /** True if the current thread has a session (e.g. false when the test was skipped before start). */
+    public static boolean isStarted() {
+        return DRIVER.get() != null;
+    }
+
     /** Driver of the current thread. Fails loudly instead of returning null. */
     public static AppiumDriver driver() {
         AppiumDriver driver = DRIVER.get();
