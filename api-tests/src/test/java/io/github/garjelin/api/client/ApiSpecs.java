@@ -30,7 +30,10 @@ public final class ApiSpecs {
         return new RequestSpecBuilder()
                 .setBaseUri(BASE_URI)
                 .setContentType(ContentType.JSON)
-                .setAccept(ContentType.JSON)
+                // Exactly "application/json". ContentType.JSON would send a LIST of JSON-like types
+                // ("application/json, application/javascript, text/javascript, text/json"),
+                // and this API answers 418 I'm a teapot to any Accept it does not support.
+                .setAccept("application/json")
                 .addFilter(new AllureRestAssured())
                 .build();
     }
