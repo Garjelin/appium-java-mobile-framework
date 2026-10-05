@@ -25,3 +25,21 @@ Appium's `hideKeyboard` fails with
 
 **Suggested fix for the app:** close the keyboard on Return (`textFieldShouldReturn`) or on a tap outside
 the fields, and/or keep bottom buttons above the keyboard (keyboard layout guide).
+
+## KNOWN-2 — API: non-standard HTTP status codes (Restful-Booker)
+
+| | |
+|---|---|
+| Component | Restful-Booker REST API (public sandbox) |
+| Severity | Low: functionality works, but clients cannot rely on status codes |
+| Affected tests | `BookingApiTest` (tests pass; the quirks are asserted or explicitly not asserted, see comments) |
+
+| Request | Actual | Expected by HTTP semantics |
+|---|---|---|
+| `POST /auth` with wrong password | `200 OK` + `{"reason": "Bad credentials"}` | `401 Unauthorized` |
+| `PUT` / `DELETE /booking/{id}` without token | `403 Forbidden` | `401 Unauthorized` (no credentials at all) |
+| `DELETE /booking/{id}` success | `201 Created` | `200 OK` or `204 No Content` |
+| `GET /ping` | `201 Created` | `200 OK` |
+
+The failed-login status is deliberately **not** asserted in `wrongPasswordGivesNoToken`:
+asserting `200` would turn the defect into "expected behavior".
